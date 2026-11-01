@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#FFFFFF"/>
+  <g transform="translate(94 34) scale(1.08)">
+    <path d="M150,18 L262,58 V140 C262,214 214,262 150,286 C86,262 38,214 38,140 V58 Z"
+          fill="#087F8C" stroke="#17324D" stroke-width="12" stroke-linejoin="round"/>
+    
+  <g fill="#FFFFFF" transform="translate(150 140) scale(1.5)">
+    <path d="M0,4 C16,4 34,22 36,38 C38,52 28,58 16,56 C8,55 4,52 0,52 C-4,52 -8,55 -16,56 C-28,58 -38,52 -36,38 C-34,22 -16,4 0,4 Z"/>
+    <ellipse cx="-37" cy="-6" rx="11" ry="14" transform="rotate(-24 -37 -6)"/>
+    <ellipse cx="-14" cy="-28" rx="12" ry="16" transform="rotate(-8 -14 -28)"/>
+    <ellipse cx="14" cy="-28" rx="12" ry="16" transform="rotate(8 14 -28)"/>
+    <ellipse cx="37" cy="-6" rx="11" ry="14" transform="rotate(24 37 -6)"/>
+  </g>
+    <circle cx="236" cy="236" r="44" fill="#17324D" stroke="#FFFFFF" stroke-width="9"/>
+    <path d="M217.52,236.88 L231.6,250.96 L256.24,222.8"
+     fill="none" stroke="#DDF4EF" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <text x="256" y="468" text-anchor="middle" font-family="'Avenir Next', 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="94"
+        letter-spacing="-1" fill="#17324D">Reoka</text>
+</svg>
