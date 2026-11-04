@@ -1,0 +1,123 @@
+/* Presentation shell shared by the three Reoka UI templates:
+   the page around the phones, the phone frame, and the Zalo Mini App chrome.
+   Everything inside .screen is template-specific. */
+
+:root {
+  --g-bg: #E9EFF1;
+  --g-ink: #17324D;
+  --g-muted: #5B7083;
+  --g-line: #D3DDE2;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body.gallery {
+  margin: 0;
+  background: var(--g-bg);
+  color: var(--g-ink);
+  font-family: var(--font, system-ui, sans-serif);
+}
+
+.g-head {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 40px 24px 8px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px 24px;
+  align-items: end;
+}
+.g-head a.g-back { grid-column: 1 / -1; color: var(--g-muted); font-size: 14px; text-decoration: none; }
+.g-head a.g-back:hover { color: var(--g-ink); text-decoration: underline; }
+.g-head h1 { margin: 0; font-size: 34px; line-height: 1.15; letter-spacing: -0.02em; }
+.g-head p { margin: 6px 0 0; color: var(--g-muted); max-width: 62ch; line-height: 1.55; font-size: 15px; }
+.g-tokens { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.g-tokens span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--g-muted); background: #fff; border: 1px solid var(--g-line); border-radius: 999px; padding: 4px 10px 4px 4px; }
+.g-tokens i { width: 16px; height: 16px; border-radius: 50%; display: inline-block; border: 1px solid rgba(0,0,0,.08); }
+
+.g-grid {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 48px 32px;
+  justify-items: center;
+}
+figure.g-shot { margin: 0; width: 360px; }
+figure.g-shot figcaption { margin-top: 14px; padding: 0 6px; }
+figure.g-shot figcaption b { display: block; font-size: 15px; }
+figure.g-shot figcaption span { display: block; font-size: 13px; color: var(--g-muted); line-height: 1.5; margin-top: 2px; }
+
+/* Phone */
+.phone {
+  width: 360px;
+  height: 760px;
+  border-radius: 40px;
+  padding: 8px;
+  background: #1C2A38;
+  box-shadow: 0 30px 60px -30px rgba(23, 50, 77, .45), 0 0 0 1px rgba(23,50,77,.25);
+}
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--app-bg, #fff);
+  isolation: isolate;
+}
+.statusbar {
+  height: 34px; flex: none;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 4px 26px 0;
+  font: 600 13px/1 -apple-system, "SF Pro Text", system-ui, sans-serif;
+  color: var(--bar-fg, #17324D);
+  background: var(--bar-bg, transparent);
+}
+.statusbar .sb-r { display: flex; gap: 5px; align-items: center; }
+.statusbar .sb-r i { display: block; background: currentColor; border-radius: 2px; }
+.statusbar .sb-r i:nth-child(1) { width: 17px; height: 10px; clip-path: polygon(0 100%, 100% 0, 100% 100%); }
+.statusbar .sb-r i:nth-child(2) { width: 15px; height: 10px; border-radius: 10px 10px 2px 2px; }
+.statusbar .sb-r i:nth-child(3) { width: 25px; height: 12px; border-radius: 4px; }
+
+/* Zalo Mini App header: title + the fixed "more / close" capsule on the right */
+.zbar {
+  height: 46px; flex: none;
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 10px 0 14px;
+  color: var(--bar-fg, #17324D);
+  background: var(--bar-bg, transparent);
+}
+.zbar .z-title { flex: 1; font-weight: 600; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.zbar .z-back { width: 32px; height: 32px; display: grid; place-items: center; margin-left: -8px; color: inherit; }
+.zbar .z-back svg { width: 22px; height: 22px; }
+.capsule {
+  flex: none;
+  display: flex; align-items: center;
+  height: 30px; border-radius: 15px;
+  border: 1px solid var(--capsule-line, rgba(23,50,77,.16));
+  background: var(--capsule-bg, rgba(255,255,255,.7));
+}
+.capsule span { width: 40px; height: 100%; display: grid; place-items: center; }
+.capsule span + span { border-left: 1px solid var(--capsule-line, rgba(23,50,77,.16)); }
+.capsule .dots { display: flex; gap: 3px; }
+.capsule .dots i { width: 4px; height: 4px; border-radius: 50%; background: var(--bar-fg, #17324D); }
+.capsule .ring { width: 15px; height: 15px; border-radius: 50%; border: 2px solid var(--bar-fg, #17324D); position: relative; }
+.capsule .ring::after { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--bar-fg, #17324D); }
+
+.home-ind { position: absolute; bottom: 7px; left: 50%; width: 120px; height: 4px; margin-left: -60px; border-radius: 2px; background: rgba(23,50,77,.35); z-index: 50; }
+
+svg.i { width: 22px; height: 22px; flex: none; }
+
+@media (max-width: 420px) {
+  .g-head { grid-template-columns: 1fr; padding: 28px 16px 4px; }
+  .g-head h1 { font-size: 28px; }
+  .g-tokens { justify-content: flex-start; }
+  .g-grid { padding: 16px 0 60px; grid-template-columns: 1fr; }
+  figure.g-shot { width: 100%; max-width: 360px; }
+  .phone { width: 100%; max-width: 360px; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }

@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reoka B · Ví thẻ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/gallery.css">
+<style>
+/* Template B, "Ví thẻ": a pet wallet.
+   Each pet is a physical-feeling pass; cards stack like a wallet and flip to a QR side.
+   Softer mint world, bigger radii, Lexend for friendly legibility. */
+:root {
+  --font: "Lexend", system-ui, sans-serif;
+  --teal: #087F8C; --teal-d: #056570; --navy: #17324D; --mint: #DDF4EF; --mint-2: #C5EAE2;
+  --muted: #587184; --faint: #8DA1AF; --line: #DCEBE7; --page: #F2F9F7;
+  --due: #9E4A0C; --due-bg: #FFEFD9; --ok: #1B6F46; --ok-bg: #DDF3E6; --danger: #B83232;
+  --app-bg: var(--page);
+}
+.screen { font-family: var(--font); color: var(--navy); font-size: 14.5px; line-height: 1.45; font-weight: 400; }
+.content { flex: 1; overflow: hidden; padding: 6px 16px 16px; display: flex; flex-direction: column; gap: 18px; }
+.h1 { margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -.02em; line-height: 1.2; }
+.h2 { margin: 0 0 10px; font-size: 16px; font-weight: 500; display: flex; justify-content: space-between; align-items: baseline; }
+.h2 a { font-size: 13px; color: var(--teal); font-weight: 500; text-decoration: none; }
+.muted { color: var(--muted); }
+p { margin: 0; }
+
+/* the pass */
+.pass { position: relative; border-radius: 22px; background: #fff; overflow: hidden; box-shadow: 0 18px 30px -22px rgba(23,50,77,.55), 0 0 0 1px rgba(23,50,77,.06); }
+.pass-h { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--teal); color: #fff; font-size: 12px; font-weight: 600; letter-spacing: .09em; }
+.pass-h b { font-size: 15px; letter-spacing: 0; }
+.pass-b { display: grid; grid-template-columns: 1fr 82px; gap: 10px; padding: 14px 16px 16px; }
+.pass-id { display: flex; gap: 12px; align-items: center; grid-column: 1 / -1; }
+.pass-id .t b { font-size: 22px; font-weight: 600; display: block; line-height: 1.15; }
+.pass-id .t span { font-size: 13px; color: var(--muted); }
+.ava { width: 64px; height: 64px; border-radius: 50%; background: var(--mint); color: var(--navy); overflow: hidden; display: grid; place-items: end center; flex: none; }
+.ava svg { width: 92%; height: 92%; }
+.kv { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; align-content: start; }
+.kv small { display: block; font-size: 11px; color: var(--muted); }
+.kv strong { display: block; font-size: 13.5px; font-weight: 500; }
+.qr { text-align: center; }
+.qr svg { width: 82px; height: 82px; padding: 6px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 2px var(--mint); color: var(--navy); }
+.pass-f { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; background: var(--mint); font-size: 12px; color: var(--teal-d); font-weight: 500; }
+.pass-f code { font: 600 12.5px var(--font); }
+
+.stack { position: relative; padding-top: 72px; }
+.peek { position: absolute; left: 10px; right: 10px; height: 80px; border-radius: 20px; padding: 10px 16px; display: flex; justify-content: space-between; color: #fff; font-size: 14px; font-weight: 500; }
+.peek span { display: flex; gap: 8px; align-items: center; height: 26px; }
+.peek .mini { width: 26px; height: 26px; border-radius: 50%; background: var(--mint); overflow: hidden; color: var(--navy); display: grid; place-items: end center; }
+.peek .mini svg { width: 100%; height: 100%; }
+.peek.p1 { top: 0; left: 18px; right: 18px; background: #fff; color: var(--teal); border: 1.5px dashed var(--teal); }
+.peek.p2 { top: 36px; background: var(--navy); }
+.peek small { font-size: 12px; opacity: .75; font-weight: 400; }
+
+/* todo tiles */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { background: #fff; border-radius: 18px; padding: 12px 14px; box-shadow: 0 0 0 1px var(--line); display: grid; gap: 6px; }
+.tile .when { display: flex; align-items: baseline; gap: 4px; }
+.tile .when b { font-size: 26px; font-weight: 600; line-height: 1; }
+.tile .when span { font-size: 12.5px; color: var(--muted); }
+.tile p { font-size: 13.5px; font-weight: 500; line-height: 1.35; }
+.tile small { font-size: 12px; color: var(--muted); }
+.tile.due { background: var(--due-bg); box-shadow: none; }
+.tile.due .when b { color: var(--due); }
+
+/* tabbar with center QR */
+.tabbar { flex: none; position: relative; display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; background: #fff; padding: 8px 0 22px; box-shadow: 0 -1px 0 var(--line); }
+.tabbar a { display: grid; justify-items: center; gap: 3px; font-size: 11px; color: var(--faint); text-decoration: none; position: relative; }
+.tabbar a.on { color: var(--teal); font-weight: 500; }
+.tabbar a.qrbtn { margin-top: -30px; color: var(--navy); }
+.tabbar a.qrbtn i { width: 56px; height: 56px; border-radius: 18px; background: var(--navy); color: #fff; display: grid; place-items: center; box-shadow: 0 10px 18px -8px rgba(23,50,77,.6); border: 4px solid #fff; }
+.tabbar a em { position: absolute; top: -3px; left: calc(50% + 5px); min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--danger); color: #fff; font: 600 10px/16px var(--font); font-style: normal; }
+
+/* buttons */
+.btn { display: flex; align-items: center; justify-content: center; gap: 8px; height: 50px; border-radius: 16px; font: 500 15px/1 var(--font); background: var(--teal); color: #fff; text-decoration: none; }
+.btn.navy { background: var(--navy); }
+.btn.soft { background: var(--mint); color: var(--teal-d); }
+.btn.white { background: #fff; color: var(--navy); box-shadow: 0 0 0 1px var(--line); }
+.btn.danger { background: var(--danger); }
+.btn svg { width: 20px; height: 20px; }
+.round { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: #fff; box-shadow: 0 0 0 1px var(--line); color: var(--navy); flex: none; }
+.round svg { width: 20px; height: 20px; }
+
+/* info tiles */
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fact { background: #fff; border-radius: 16px; padding: 10px 12px; box-shadow: 0 0 0 1px var(--line); }
+.fact small { display: block; font-size: 11.5px; color: var(--muted); }
+.fact b { display: block; font-size: 14px; font-weight: 500; margin-top: 2px; }
+
+/* flip toggle */
+.flip { display: flex; justify-content: center; gap: 4px; padding: 4px; border-radius: 999px; background: #fff; box-shadow: 0 0 0 1px var(--line); align-self: center; }
+.flip span { font-size: 13px; padding: 6px 14px; border-radius: 999px; color: var(--muted); }
+.flip span.on { background: var(--navy); color: #fff; }
+
+.back-face { border-radius: 22px; background: var(--navy); color: #fff; padding: 18px 18px 16px; display: grid; justify-items: center; gap: 10px; text-align: center; box-shadow: 0 18px 30px -22px rgba(23,50,77,.7); }
+.back-face .qrbig { width: 170px; height: 170px; background: #fff; border-radius: 18px; padding: 12px; color: var(--navy); }
+.back-face b { font-size: 17px; font-weight: 600; }
+.back-face p { font-size: 12.5px; color: #B9CADA; max-width: 30ch; }
+.back-face code { font: 600 13px var(--font); background: rgba(255,255,255,.12); padding: 4px 10px; border-radius: 999px; }
+
+/* form */
+.steps { display: flex; gap: 6px; }
+.steps i { flex: 1; height: 4px; border-radius: 2px; background: var(--mint-2); }
+.steps i.on { background: var(--teal); }
+.species { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.species div { background: #fff; border-radius: 18px; box-shadow: 0 0 0 1px var(--line); padding: 10px 0 10px; display: grid; justify-items: center; gap: 4px; font-size: 13.5px; font-weight: 500; }
+.species div .ava { width: 54px; height: 54px; }
+.species div.on { box-shadow: 0 0 0 2px var(--teal); background: #F7FDFC; }
+.species div.on::after { content: ""; }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 13px; color: var(--muted); }
+.input { height: 50px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px var(--line); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 15px; }
+.input.focus { box-shadow: 0 0 0 2px var(--teal); }
+.input svg { width: 18px; height: 18px; color: var(--faint); }
+.pills { display: flex; gap: 8px; }
+.pills span { flex: 1; height: 50px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1px var(--line); display: grid; place-items: center; font-size: 14.5px; }
+.pills span.on { box-shadow: 0 0 0 2px var(--teal); color: var(--teal-d); font-weight: 500; }
+.footer { flex: none; padding: 10px 16px 26px; display: flex; gap: 10px; }
+.footer .btn { flex: 1; }
+
+/* dialog */
+.scrim { position: absolute; inset: 0; background: rgba(15, 30, 45, .55); z-index: 10; }
+.dialog { position: absolute; left: 22px; right: 22px; top: 50%; transform: translateY(-50%); z-index: 11; background: #fff; border-radius: 26px; padding: 22px 20px 18px; text-align: center; display: grid; gap: 12px; }
+.dialog .ava { margin: 0 auto; width: 72px; height: 72px; filter: grayscale(.4); }
+.dialog h3 { margin: 0; font-size: 19px; font-weight: 600; }
+.dialog p { font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+.dialog .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+
+/* calendar */
+.cal { background: #fff; border-radius: 22px; padding: 14px 12px 10px; box-shadow: 0 0 0 1px var(--line); }
+.cal-h { display: flex; justify-content: space-between; align-items: center; padding: 0 4px 8px; }
+.cal-h b { font-size: 16px; font-weight: 500; }
+.cal-h span { display: flex; gap: 6px; }
+.cal-h span i { width: 28px; height: 28px; border-radius: 50%; background: var(--page); display: grid; place-items: center; color: var(--muted); }
+.cal-h span svg { width: 16px; height: 16px; }
+.cal-g { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; row-gap: 2px; font-size: 13px; }
+.cal-g .dn { font-size: 11px; color: var(--faint); padding-bottom: 4px; }
+.cal-g span { height: 34px; display: grid; place-items: center; position: relative; }
+.cal-g span.o { color: #C2CFD6; }
+.cal-g span.today { font-weight: 600; }
+.cal-g span.today::before { content: ""; position: absolute; width: 32px; height: 32px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--navy); }
+.cal-g span.sel { color: #fff; font-weight: 600; }
+.cal-g span.sel::before { content: ""; position: absolute; width: 32px; height: 32px; border-radius: 50%; background: var(--teal); z-index: -1; }
+.cal-g span[data-d]::after { content: ""; position: absolute; bottom: 1px; width: 5px; height: 5px; border-radius: 50%; background: var(--d); }
+.ev { display: flex; gap: 12px; background: #fff; border-radius: 18px; box-shadow: 0 0 0 1px var(--line); padding: 12px 14px; align-items: center; }
+.ev .bar { width: 4px; align-self: stretch; border-radius: 2px; background: var(--c); }
+.ev .t { flex: 1; }
+.ev b { display: block; font-size: 14.5px; font-weight: 500; }
+.ev span { font-size: 12.5px; color: var(--muted); }
+.ev time { text-align: right; font-size: 12.5px; color: var(--muted); }
+.ev time b { font-size: 15px; color: var(--navy); }
+.badge { display: inline-block; font-size: 11.5px; font-weight: 500; padding: 3px 8px; border-radius: 999px; }
+.badge.due { background: var(--due-bg); color: var(--due); }
+.badge.ok { background: var(--ok-bg); color: var(--ok); }
+.badge.plain { background: var(--page); color: var(--muted); }
+
+/* pet switch header */
+.petsw { display: flex; align-items: center; gap: 10px; }
+.petsw .ava { width: 44px; height: 44px; }
+.petsw b { font-size: 17px; font-weight: 600; display: block; }
+.petsw span { font-size: 12.5px; color: var(--muted); }
+.petsw .round { margin-left: auto; width: 34px; height: 34px; }
+.tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--line); }
+.tabs span { padding: 0 0 10px; font-size: 14px; color: var(--muted); }
+.tabs span.on { color: var(--navy); font-weight: 500; box-shadow: inset 0 -2.5px 0 var(--teal); }
+
+.vax { background: #fff; border-radius: 18px; box-shadow: 0 0 0 1px var(--line); padding: 14px; display: grid; gap: 8px; }
+.vax-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.vax-top b { font-size: 15px; font-weight: 500; }
+.vax-top span { display: block; font-size: 12.5px; color: var(--muted); }
+.prog { height: 6px; border-radius: 3px; background: var(--mint); overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--teal); border-radius: 3px; }
+.prog.due i { background: #E08A3C; }
+.vax-dates { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
+.vax-dates b { color: var(--navy); font-weight: 500; }
+.src { font-size: 11.5px; color: var(--faint); display: flex; gap: 6px; align-items: center; }
+.src svg { width: 14px; height: 14px; }
+
+/* map screen */
+.mapfull { position: absolute; inset: 0; }
+.mapfull svg.streets { width: 100%; height: 100%; display: block; }
+.mpin { position: absolute; transform: translate(-50%, -100%); }
+.mpin i { display: flex; align-items: center; gap: 4px; background: #fff; color: var(--navy); font: 500 12px var(--font); font-style: normal; padding: 5px 9px 5px 5px; border-radius: 999px; box-shadow: 0 6px 14px -6px rgba(23,50,77,.5); white-space: nowrap; }
+.mpin i em { width: 22px; height: 22px; border-radius: 50%; background: var(--teal); color: #fff; display: grid; place-items: center; }
+.mpin i em svg { width: 13px; height: 13px; }
+.mpin.sel i { background: var(--navy); color: #fff; }
+.mpin.sel i em { background: #fff; color: var(--navy); }
+.me { position: absolute; width: 16px; height: 16px; border-radius: 50%; background: #2F7BEA; border: 3px solid #fff; box-shadow: 0 0 0 9px rgba(47,123,234,.18); }
+.overlay-top { position: absolute; top: 80px; left: 14px; right: 14px; display: grid; gap: 8px; z-index: 2; }
+.searchb { height: 48px; border-radius: 16px; background: #fff; display: flex; gap: 10px; align-items: center; padding: 0 14px; color: var(--faint); box-shadow: 0 8px 18px -10px rgba(23,50,77,.45); }
+.searchb svg { width: 20px; height: 20px; color: var(--muted); }
+.chips { display: flex; gap: 6px; overflow: hidden; }
+.chip { flex: none; height: 32px; padding: 0 12px; border-radius: 999px; background: #fff; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; box-shadow: 0 0 0 1px var(--line); }
+.chip.on { background: var(--teal); color: #fff; box-shadow: none; }
+.carousel { position: absolute; left: 0; right: 0; bottom: 30px; display: flex; gap: 10px; padding: 0 14px; z-index: 2; }
+.pcard { flex: none; width: 282px; background: #fff; border-radius: 20px; padding: 14px; box-shadow: 0 14px 28px -14px rgba(23,50,77,.5); display: grid; gap: 8px; }
+.pcard b { font-size: 15px; font-weight: 500; }
+.pcard p { font-size: 12.5px; color: var(--muted); }
+.pcard .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 2px; }
+.pcard .btn { height: 40px; border-radius: 12px; font-size: 13.5px; }
+
+/* clinic */
+.clinic-top { background: var(--teal); color: #fff; padding: 4px 18px 46px; }
+.clinic-top b { display: block; font-size: 20px; font-weight: 600; line-height: 1.25; }
+.clinic-top span { font-size: 13px; color: #CFEDEA; }
+.clinic-top .open { display: inline-block; margin-top: 10px; font-size: 12px; background: rgba(255,255,255,.16); padding: 4px 10px; border-radius: 999px; color: #fff; }
+.ctiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: -32px; padding: 0 16px; }
+.ctile { background: #fff; border-radius: 18px; padding: 14px; box-shadow: 0 10px 20px -16px rgba(23,50,77,.5), 0 0 0 1px var(--line); display: grid; gap: 6px; }
+.ctile i { width: 38px; height: 38px; border-radius: 12px; background: var(--mint); color: var(--teal); display: grid; place-items: center; }
+.ctile i svg { width: 20px; height: 20px; }
+.ctile b { font-size: 14.5px; font-weight: 500; }
+.ctile span { font-size: 12px; color: var(--muted); }
+.ctile.primary { background: var(--navy); color: #fff; }
+.ctile.primary i { background: rgba(255,255,255,.14); color: #fff; }
+.ctile.primary span { color: #B9CADA; }
+.quickq { display: grid; gap: 8px; }
+.quickq a { display: flex; align-items: center; justify-content: space-between; background: #fff; border-radius: 16px; padding: 13px 14px; box-shadow: 0 0 0 1px var(--line); font-size: 14px; color: var(--navy); text-decoration: none; }
+.quickq a svg { width: 18px; height: 18px; color: var(--faint); }
+
+/* notifications */
+.ncard { background: #fff; border-radius: 18px; box-shadow: 0 0 0 1px var(--line); padding: 14px; display: grid; grid-template-columns: 40px 1fr; gap: 12px; position: relative; }
+.ncard .ic { width: 40px; height: 40px; border-radius: 14px; background: var(--mint); color: var(--teal); display: grid; place-items: center; }
+.ncard .ic svg { width: 20px; height: 20px; }
+.ncard .ic.due { background: var(--due-bg); color: var(--due); }
+.ncard b { font-size: 14.5px; font-weight: 500; display: block; line-height: 1.35; padding-right: 14px; }
+.ncard p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.ncard time { font-size: 11.5px; color: var(--faint); display: block; margin-top: 6px; }
+.ncard.unread::after { content: ""; position: absolute; right: 14px; top: 18px; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+.ncard .nb { display: flex; gap: 8px; margin-top: 10px; }
+.ncard .nb .btn { height: 36px; border-radius: 12px; font-size: 13px; padding: 0 14px; }
+.daylabel { font-size: 13px; color: var(--muted); margin: 0 4px -8px; }
+</style>
+</head>
+<body class="gallery">
+
+<header class="g-head">
+  <a class="g-back" href="index.html">← Tổng quan các mẫu</a>
+  <div>
+    <h1>Mẫu B · Ví thẻ</h1>
+    <p>Mỗi bé là một tấm thẻ thật, xếp chồng như ví thẻ trên điện thoại và lật mặt sau để đưa mã QR cho phòng khám. Nền mint, bo góc lớn, chữ Lexend dễ đọc, cảm giác thân thiện hơn mẫu A.</p>
+  </div>
+  <div class="g-tokens">
+    <span><i style="background:#087F8C"></i>Teal #087F8C</span>
+    <span><i style="background:#17324D"></i>Navy #17324D</span>
+    <span><i style="background:#DDF4EF"></i>Mint #DDF4EF</span>
+    <span><i style="background:#F2F9F7"></i>Nền #F2F9F7</span>
+    <span>Lexend</span>
+  </div>
+</header>
+
+<main class="g-grid">
+
+<!-- 1. Wallet home -->
+<figure class="g-shot">
+<div class="phone"><div class="screen">
+  <div class="statusbar"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar"><span class="z-title">Reoka</span><span class="capsule"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="content" style="gap:16px">
+    <div><p class="h1">Thú cưng của bạn</p></div>
+    <div class="stack">
+      <div class="peek p1"><span><svg class="i" style="width:20px;height:20px"><use href="#i-plus"/></svg>Thêm thú cưng</span></div>
+      <div class="peek p2"><span><span class="mini"><svg><use href="#pet-cat"/></svg></span>Bơ</span><small>#RK-0388</small></div>
+      <div class="pass">
+        <div class="pass-h">THẺ THÚ CƯNG <b>Reoka</b></div>
+        <div class="pass-b">
+          <div class="pass-id"><span class="ava"><svg><use href="#pet-dog"/></svg></span><div class="t"><b>Mochi</b><span>Chó Corgi, đực</span></div></div>
+          <div class="kv">
+            <div><small>Ngày sinh</small><strong>12/03/2023</strong></div>
+            <div><small>Cân nặng</small><strong>11,2 kg</strong></div>
+            <div style="grid-column:1/-1"><small>Chủ nuôi</small><strong>Nguyễn Văn An</strong></div>
+          </div>
+          <div class="qr"><svg data-qr="mochi"></svg></div>
+        </div>
+        <div class="pass-f"><code>#RK-0215</code><span>Tiêm chủng đủ mũi</span></div>
+      </div>
+    </div>
+    <section>
+      <p class="h2">Việc cần làm<a href="#">Lịch</a></p>
+      <div class="tiles">
+        <div class="tile due"><div class="when"><b>4</b><span>ngày nữa</span></div><p>Bơ tiêm phòng dại</p><small>Th 6, 06/11, 9:30</small></div>
+        <div class="tile"><div class="when"><b>9</b><span>ngày nữa</span></div><p>Mochi tái khám da</p><small>Th 4, 11/11, 17:00</small></div>
+      </div>
+    </section>
+  </div>
+  <nav class="tabbar">
+    <a class="on" href="#"><svg class="i"><use href="#i-paw"/></svg>Ví thẻ</a>
+    <a href="#"><svg class="i"><use href="#i-cal"/></svg>Lịch</a>
+    <a class="qrbtn" href="#"><i><svg class="i"><use href="#i-scan"/></svg></i>Mở thẻ</a>
+    <a href="#"><svg class="i"><use href="#i-bell"/></svg>Thông báo<em>2</em></a>
+    <a href="#"><svg class="i"><use href="#i-user"/></svg>Tôi</a>
+  </nav>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Ví thú cưng</b><span>Các thẻ xếp chồng, chạm vào phần đầu thẻ để kéo bé đó lên trước. Nút giữa thanh tab mở nhanh mặt QR khi đứng ở quầy phòng khám.</span></figcaption>
+</figure>
+
+<!-- 2. Card back / detail -->
+<figure class="g-shot">
+<div class="phone"><div class="screen">
+  <div class="statusbar"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar"><a class="z-back"><svg><use href="#i-back"/></svg></a><span class="z-title">Mochi</span><span class="capsule"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="content" style="gap:14px">
+    <div class="flip"><span>Mặt trước</span><span class="on">Mã QR</span></div>
+    <div class="back-face">
+      <b>Mochi, #RK-0215</b>
+      <svg class="qrbig" data-qr="mochi-big"></svg>
+      <p>Đưa mã này cho phòng khám để mở hồ sơ. Người lạ quét chỉ thấy thông tin tiêm chủng.</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><small>Loài</small><b>Chó</b></div>
+      <div class="fact"><small>Giới tính</small><b>Đực</b></div>
+      <div class="fact"><small>Tuổi</small><b>3 năm 7 th</b></div>
+      <div class="fact"><small>Màu lông</small><b>Vàng trắng</b></div>
+      <div class="fact"><small>Triệt sản</small><b>Chưa</b></div>
+      <div class="fact"><small>Cân nặng</small><b>11,2 kg</b></div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <a class="btn soft" style="flex:1"><svg><use href="#i-edit"/></svg>Sửa</a>
+      <a class="btn soft" style="flex:1"><svg><use href="#i-share"/></svg>Gửi thẻ</a>
+      <a class="round" style="width:50px;height:50px;border-radius:16px;color:var(--danger)"><svg><use href="#i-trash"/></svg></a>
+    </div>
+  </div>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Mặt QR của thẻ</b><span>Lật thẻ để lấy QR cỡ lớn, dễ quét ở quầy. Thông tin cơ bản xếp thành ô nhỏ, sửa và xoá nằm ngay dưới.</span></figcaption>
+</figure>
+
+<!-- 3. Add pet -->
+<figure class="g-shot">
+<div class="phone"><div class="screen">
+  <div class="statusbar"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar"><a class="z-back"><svg><use href="#i-back"/></svg></a><span class="z-title">Thêm thú cưng</span><span class="capsule"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="content" style="gap:16px">
+    <div class="steps"><i class="on"></i><i></i></div>
+    <div><p class="h1" style="font-size:21px">Bé là chó hay mèo?</p><p class="muted" style="font-size:13px;margin-top:4px">Bước 1/2. Bước sau thêm ảnh và tên để làm thẻ.</p></div>
+    <div class="species">
+      <div><span class="ava"><svg><use href="#pet-dog"/></svg></span>Chó</div>
+      <div class="on"><span class="ava"><svg><use href="#pet-cat"/></svg></span>Mèo</div>
+      <div><span class="ava" style="place-items:center;color:var(--teal)"><svg style="width:26px;height:26px"><use href="#i-paw"/></svg></span>Khác</div>
+    </div>
+    <div class="field"><label>Giống</label><div class="input focus">Anh lông ngắn<svg><use href="#i-down"/></svg></div></div>
+    <div class="field"><label>Giới tính</label><div class="pills"><span>Đực</span><span class="on">Cái</span></div></div>
+    <div class="field"><label>Ngày sinh (ước chừng cũng được)</label><div class="input">05/08/2024<svg><use href="#i-cal"/></svg></div></div>
+  </div>
+  <div class="footer"><a class="btn">Tiếp tục</a></div>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Thêm thú cưng, 2 bước</b><span>Mỗi bước ít câu hỏi, chọn bằng ô lớn thay vì gõ. Bước 2 gồm ảnh, tên, màu lông và xem trước tấm thẻ.</span></figcaption>
+</figure>
+
+<!-- 4. Delete dialog -->
+<figure class="g-shot">
+<div class="phone"><div class="screen">
+  <div class="statusbar"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar"><a class="z-back"><svg><use href="#i-back"/></svg></a><span class="z-title">Mochi</span><span class="capsule"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="content">
+    <div class="flip"><span class="on">Mặt trước</span><span>Mã QR</span></div>
+    <div class="pass">
+      <div class="pass-h">THẺ THÚ CƯNG <b>Reoka</b></div>
+      <div class="pass-b">
+        <div class="pass-id"><span class="ava"><svg><use href="#pet-dog"/></svg></span><div class="t"><b>Mochi</b><span>Chó Corgi, đực</span></div></div>
+        <div class="kv"><div><small>Ngày sinh</small><strong>12/03/2023</strong></div><div><small>Cân nặng</small><strong>11,2 kg</strong></div></div>
+        <div class="qr"><svg data-qr="mochi"></svg></div>
+      </div>
+    </div>
+  </div>
+  <div class="scrim"></div>
+  <div class="dialog">
+    <span class="ava"><svg><use href="#pet-dog"/></svg></span>
+    <h3>Xoá thẻ của Mochi?</h3>
+    <p>Mã QR trên thẻ sẽ ngừng hoạt động và bạn không nhận nhắc lịch cho Mochi nữa. Hồ sơ khám vẫn được phòng khám lưu giữ.</p>
+    <div class="row2"><a class="btn white">Giữ lại</a><a class="btn danger">Xoá thẻ</a></div>
+  </div>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Xoá thú cưng</b><span>Hộp thoại giữa màn hình, có ảnh của bé để người dùng chắc chắn mình đang xoá đúng thẻ.</span></figcaption>
+</figure>
+
+<!-- 5. Calendar -->
+<figure class="g-shot">
+<div class="phone"><div class="screen">
+  <div class="statusbar"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar"><span class="z-title">Lịch</span><span class="capsule"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="content" style="gap:12px">
+    <div class="cal">
+      <div class="cal-h"><b>Tháng 11, 2026</b><span><i><svg><use href="#i-back"/></svg></i><i><svg><use href="#i-chev"/></svg></i></span></div>
+      <div class="cal-g">
+        <span class="dn">T2</span><span class="dn">T3</span><span class="dn">T4</span><span class="dn">T5</span><span class="dn">T6</span><span class="dn">T7</span><span class="dn">CN</span>
+        <span class="o">26</span><span class="o">27</span><span class="o">28</span><span class="o">29</span><span class="o">30</span><span class="o">31</span><span>1</span>
+        <span class="today">2</span><span>3</span><span>4</span><span>5</span><span class="sel">6</span><span>7</span><span>8</span>
+        <span>9</span><span>10</span><span data-d style="--d:var(--teal)">11</span><span>12</span><span>13</span><span>14</span><span data-d style="--d:var(--teal)">15</span>
+        <span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span>
+        <span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span>
+      </div>
+    </div>
+    <p class="h2" style="margin:2px 2px 0">Thứ Sáu, 06/11</p>
+    <div class="ev" style="--c:var(--navy)"><i class="bar"></i><div class="t"><b>Bơ tiêm phòng dại</b><span>Thú y Bình An</span><div style="margin-top:5px"><span class="badge ok">Đã xác nhận</span></div></div><time><b>9:30</b><br>45 phút</time></div>
+    <p class="h2" style="margin:2px 2px 0">Sắp tới</p>
+    <div class="ev" style="--c:var(--teal)"><i class="bar"></i><div class="t"><b>Mochi tái khám da</b><span>PK Thú y Hoa Sen</span></div><time><b>11/11</b><br>17:00</time></div>
+  </div>
+  <nav class="tabbar">
+    <a href="#"><svg class="i"><use href="#i-paw"/></svg>Ví thẻ</a>
+    <a class="on" href="#"><svg class="i"><use href="#i-cal"/></svg>Lịch</a>
+    <a class="qrbtn" href="#"><i><svg class="i"><use href="#i-scan"/></svg></i>Mở thẻ</a>
+    <a href="#"><svg class="i"><use href="#i-bell"/></svg>Thông báo<em>2</em></a>
+    <a href="#"><svg class="i"><use href="#i-user"/></svg>Tôi</a>
+  </nav>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Lịch khám và tiêm</b><span>Lịch tháng có chấm màu theo từng bé (teal là Mochi, navy là Bơ). Chạm một ngày để xem chi tiết lịch hẹn.</span></figcaption>
+</figure>
+
+<!-- 6. Vaccination history -->
+<figure class="g-shot">
+<div class="phone"><div class="screen">
+  <div class="statusbar"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar"><a class="z-back"><svg><use href="#i-back"/></svg></a><span class="z-title">Sổ sức khoẻ</span><span class="capsule"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="content" style="gap:12px">
+    <div class="petsw"><span class="ava"><svg><use href="#pet-dog"/></svg></span><div><b>Mochi</b><span>Đổi bé khác</span></div><span class="round"><svg><use href="#i-down"/></svg></span></div>
+    <div class="tabs"><span class="on">Tiêm chủng</span><span>Khám bệnh</span><span>Tệp đính kèm</span></div>
+    <div class="vax">
+      <div class="vax-top"><div><b>Vắc-xin 7 bệnh</b><span>Mũi nhắc hằng năm</span></div><span class="badge due">Còn 13 ngày</span></div>
+      <div class="prog due"><i style="width:96%"></i></div>
+      <div class="vax-dates"><span>Đã tiêm <b>15/11/2025</b></span><span>Tiêm lại <b>15/11/2026</b></span></div>
+      <div class="src"><svg><use href="#i-shield"/></svg>PK Thú y Hoa Sen xác nhận</div>
+    </div>
+    <div class="vax">
+      <div class="vax-top"><div><b>Vắc-xin dại</b><span>Rabisin, lô R2603</span></div><span class="badge ok">Còn hiệu lực</span></div>
+      <div class="prog"><i style="width:62%"></i></div>
+      <div class="vax-dates"><span>Đã tiêm <b>20/03/2026</b></span><span>Tiêm lại <b>20/03/2027</b></span></div>
+      <div class="src"><svg><use href="#i-shield"/></svg>Thú y Bình An xác nhận</div>
+    </div>
+    <div class="vax">
+      <div class="vax-top"><div><b>Vắc-xin 7 bệnh, mũi 3</b><span>Mũi cơ bản</span></div><span class="badge plain">Hoàn tất</span></div>
+      <div class="vax-dates"><span>Đã tiêm <b>10/06/2023</b></span></div>
+    </div>
+  </div>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Sổ sức khoẻ: tiêm chủng</b><span>Mỗi mũi có thanh thời gian tới ngày tiêm lại, nên nhìn là biết mũi nào sắp hết hạn. Tab “Khám bệnh” dùng cùng kiểu thẻ.</span></figcaption>
+</figure>
+
+<!-- 7. Map -->
+<figure class="g-shot">
+<div class="phone"><div class="screen">
+  <div class="mapfull">
+    <svg class="streets" viewBox="0 0 344 744" preserveAspectRatio="xMidYMid slice">
+      <rect width="344" height="744" fill="#E8F0EC"/>
+      <path d="M230 0 C210 160 260 260 344 300 L344 520 C250 470 200 380 140 330 C100 300 130 120 150 0Z" fill="#D3EBDD"/>
+      <path d="M0 560 C90 520 160 620 220 744 L0 744Z" fill="#CBE2EE"/>
+      <g stroke="#fff" stroke-width="10" fill="none" stroke-linecap="round"><path d="M-10 300 L360 250"/><path d="M90 -10 L140 760"/><path d="M-10 520 C120 470 220 560 360 500"/></g>
+      <g stroke="#fff" stroke-width="5" fill="none"><path d="M0 120 L344 160"/><path d="M260 0 L230 744"/><path d="M0 410 L344 380"/><path d="M40 0 L10 744"/><path d="M330 220 L180 744"/></g>
+    </svg>
+    <span class="me" style="left:150px;top:330px"></span>
+    <span class="mpin sel" style="left:200px;top:300px"><i><em><svg><use href="#i-syringe"/></svg></em>Hoa Sen, 1,2 km</i></span>
+    <span class="mpin" style="left:90px;top:440px"><i><em><svg><use href="#i-syringe"/></svg></em>Bình An</i></span>
+    <span class="mpin" style="left:270px;top:210px"><i><em><svg><use href="#i-syringe"/></svg></em>Tân Định</i></span>
+  </div>
+  <div class="statusbar" style="position:relative;z-index:3"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar" style="position:relative;z-index:3"><a class="z-back round" style="width:34px;height:34px;margin-left:0"><svg style="width:18px;height:18px"><use href="#i-back"/></svg></a><span class="z-title"></span><span class="capsule" style="--capsule-bg:#fff"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="overlay-top">
+    <div class="searchb"><svg><use href="#i-search"/></svg>Tìm điểm tiêm gần bạn</div>
+    <div class="chips"><span class="chip on">Đang mở cửa</span><span class="chip">Vắc-xin dại</span><span class="chip">Cho mèo</span></div>
+  </div>
+  <div class="carousel">
+    <div class="pcard">
+      <div style="display:flex;justify-content:space-between"><b>Phòng khám Thú y Hoa Sen</b><span class="badge ok">Mở</span></div>
+      <p>214 Nguyễn Đình Chiểu, Q.3. Có 7 bệnh, dại, 4 bệnh cho mèo.</p>
+      <div class="btns"><a class="btn soft"><svg><use href="#i-nav"/></svg>Đường đi</a><a class="btn"><svg><use href="#i-cal"/></svg>Đặt lịch</a></div>
+    </div>
+    <div class="pcard"><b>Thú y Bình An</b><p>88 Ba Tháng Hai, Q.10</p></div>
+  </div>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Tìm điểm tiêm chủng</b><span>Bản đồ toàn màn hình, nhãn ghim ghi luôn tên và khoảng cách. Vuốt thẻ phía dưới để chuyển giữa các điểm.</span></figcaption>
+</figure>
+
+<!-- 8. Contact -->
+<figure class="g-shot">
+<div class="phone"><div class="screen" style="--bar-fg:#fff;--capsule-line:rgba(255,255,255,.3);--capsule-bg:rgba(255,255,255,.12)">
+  <div class="statusbar" style="background:var(--teal)"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar" style="background:var(--teal)"><a class="z-back"><svg><use href="#i-back"/></svg></a><span class="z-title"></span><span class="capsule"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="clinic-top"><b>Phòng khám Thú y Hoa Sen</b><span>214 Nguyễn Đình Chiểu, Quận 3</span><br><span class="open">Đang mở, đóng cửa lúc 20:00</span></div>
+  <div class="ctiles">
+    <div class="ctile primary"><i><svg><use href="#i-chat"/></svg></i><b>Nhắn Zalo</b><span>Thường trả lời trong 15 phút</span></div>
+    <div class="ctile"><i><svg><use href="#i-phone"/></svg></i><b>Gọi điện</b><span>028 3930 1234</span></div>
+    <div class="ctile"><i><svg><use href="#i-cal"/></svg></i><b>Đặt lịch</b><span>Chọn giờ còn trống</span></div>
+    <div class="ctile"><i><svg><use href="#i-nav"/></svg></i><b>Chỉ đường</b><span>1,2 km</span></div>
+  </div>
+  <div class="content" style="padding-top:16px;gap:10px">
+    <p class="h2" style="margin:0 2px">Hỏi nhanh qua Zalo</p>
+    <div class="quickq">
+      <a>Đổi giờ hẹn tái khám của Mochi<svg><use href="#i-chev"/></svg></a>
+      <a>Bé có dấu hiệu bất thường<svg><use href="#i-chev"/></svg></a>
+    </div>
+  </div>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Liên hệ phòng khám</b><span>Bốn cách liên hệ dạng ô lớn. “Hỏi nhanh” mở chat Zalo OA của phòng khám với câu hỏi và mã thẻ của bé điền sẵn.</span></figcaption>
+</figure>
+
+<!-- 9. Notifications -->
+<figure class="g-shot">
+<div class="phone"><div class="screen">
+  <div class="statusbar"><span>9:41</span><span class="sb-r"><i></i><i></i><i></i></span></div>
+  <div class="zbar"><span class="z-title">Thông báo</span><span class="capsule"><span><span class="dots"><i></i><i></i><i></i></span></span><span><span class="ring"></span></span></span></div>
+  <div class="content" style="gap:12px">
+    <div class="chips"><span class="chip on">Tất cả</span><span class="chip">Nhắc lịch</span><span class="chip">Hồ sơ</span><span class="chip">Thẻ QR</span></div>
+    <p class="daylabel">Hôm nay</p>
+    <div class="ncard unread"><span class="ic due"><svg><use href="#i-syringe"/></svg></span><div><b>Bơ tiêm phòng dại sau 4 ngày</b><p>Thứ Sáu 06/11, 9:30, Thú y Bình An.</p><div class="nb"><a class="btn">Sẽ đến</a><a class="btn white">Đổi lịch</a></div><time>8:00</time></div></div>
+    <div class="ncard unread"><span class="ic"><svg><use href="#i-clip"/></svg></span><div><b>Hồ sơ khám mới của Mochi</b><p>PK Thú y Hoa Sen đã thêm chẩn đoán và đơn thuốc.</p><time>7:15</time></div></div>
+    <p class="daylabel">Hôm qua</p>
+    <div class="ncard"><span class="ic"><svg><use href="#i-qr"/></svg></span><div><b>Có người vừa quét thẻ của Mochi</b><p>Khu vực Quận 3, lúc 16:20.</p><time>16:20</time></div></div>
+  </div>
+  <nav class="tabbar">
+    <a href="#"><svg class="i"><use href="#i-paw"/></svg>Ví thẻ</a>
+    <a href="#"><svg class="i"><use href="#i-cal"/></svg>Lịch</a>
+    <a class="qrbtn" href="#"><i><svg class="i"><use href="#i-scan"/></svg></i>Mở thẻ</a>
+    <a class="on" href="#"><svg class="i"><use href="#i-bell"/></svg>Thông báo<em>2</em></a>
+    <a href="#"><svg class="i"><use href="#i-user"/></svg>Tôi</a>
+  </nav>
+  <div class="home-ind"></div>
+</div></div>
+<figcaption><b>Thông báo</b><span>Lọc theo loại. Nhắc lịch có hai nút: xác nhận sẽ đến hoặc đổi lịch, phòng khám nhận được phản hồi ngay.</span></figcaption>
+</figure>
+
+</main>
+<script src="shared/kit.js"></script>
+</body>
+</html>

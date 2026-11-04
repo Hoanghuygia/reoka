@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reoka UI Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal: #087F8C; --navy: #17324D; --mint: #DDF4EF;
+  --bg: #FFFFFF; --panel: #F4F7F8; --ink: #17324D; --muted: #566B7E; --line: #DFE7EA;
+  --good: #1E7449; --good-bg: #E4F4EB; --mid: #8A5A0B; --mid-bg: #FFF2DC; --low: #9A3434; --low-bg: #FBE9E9;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1E2C; --panel: #172B3D; --ink: #E6EEF3; --muted: #9DB0C0; --line: #29425A; --mint: #1C3E44;
+    --good: #7FD6A6; --good-bg: #173A2A; --mid: #F2C46B; --mid-bg: #3B2F15; --low: #F19A9A; --low-bg: #3E1F22;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1E2C; --panel: #172B3D; --ink: #E6EEF3; --muted: #9DB0C0; --line: #29425A; --mint: #1C3E44;
+  --good: #7FD6A6; --good-bg: #173A2A; --mid: #F2C46B; --mid-bg: #3B2F15; --low: #F19A9A; --low-bg: #3E1F22;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.6 "Be Vietnam Pro", system-ui, sans-serif; }
+a { color: var(--teal); }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.prose { max-width: 70ch; }
+h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.1; letter-spacing: -.025em; margin: 0; font-weight: 700; }
+h2 { font-size: 28px; line-height: 1.2; letter-spacing: -.015em; margin: 0 0 12px; font-weight: 700; }
+h3 { font-size: 20px; line-height: 1.3; margin: 0 0 6px; font-weight: 600; }
+p { margin: 0 0 12px; }
+.lead { font-size: 18px; color: var(--muted); }
+section { padding: 56px 0; border-top: 1px solid var(--line); }
+
+header.top { padding: 48px 0 40px; display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; }
+header.top img { width: 96px; height: 96px; border-radius: 22px; background: #fff; }
+header.top p { margin-top: 10px; }
+
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; background: var(--panel); border-radius: 20px; padding: 28px; margin-bottom: 8px; }
+.verdict b.pick { display: inline-block; background: var(--teal); color: #fff; border-radius: 8px; padding: 2px 10px; font-size: 14px; margin-bottom: 8px; }
+.verdict ul { margin: 8px 0 0; padding-left: 20px; }
+.verdict li { margin-bottom: 4px; }
+
+.tpl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 36px; align-items: start; padding: 40px 0; }
+.tpl + .tpl { border-top: 1px dashed var(--line); }
+.shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.shots img { width: 100%; height: auto; display: block; border-radius: 18px; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 16px; }
+.meta span { font-size: 13px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
+.pros { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; font-size: 15px; }
+.pros h4 { margin: 0 0 4px; font-size: 14px; font-weight: 600; }
+.pros ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.pros li { margin-bottom: 3px; }
+.open { display: inline-flex; align-items: center; gap: 8px; background: var(--navy); color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 15px; }
+:root[data-theme="dark"] .open { background: var(--teal); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .open { background: var(--teal); } }
+.open:focus-visible, a:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; font-size: 14px; color: var(--muted); }
+td:first-child { font-weight: 500; }
+.scroll { overflow-x: auto; }
+.r { display: inline-block; font-size: 13px; font-weight: 600; border-radius: 6px; padding: 1px 8px; white-space: nowrap; }
+.r.g { color: var(--good); background: var(--good-bg); }
+.r.m { color: var(--mid); background: var(--mid-bg); }
+.r.l { color: var(--low); background: var(--low-bg); }
+
+.feat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+.feat > div { background: var(--panel); border-radius: 18px; padding: 22px; }
+.feat h3 { font-size: 17px; }
+.feat ul { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.feat li b { display: block; font-weight: 600; font-size: 15px; }
+.feat li span { color: var(--muted); font-size: 14px; line-height: 1.5; display: block; }
+
+.notes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; margin-top: 16px; }
+.notes div { border-left: 3px solid var(--teal); padding: 2px 0 2px 14px; }
+.notes b { display: block; font-weight: 600; }
+.notes span { color: var(--muted); font-size: 15px; }
+code { font-size: .9em; background: var(--panel); padding: 1px 5px; border-radius: 5px; }
+
+ol.steps { padding-left: 22px; }
+ol.steps li { margin-bottom: 8px; }
+footer { padding: 32px 0 56px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+
+@media (max-width: 860px) {
+  .tpl, .verdict, .pros, .notes { grid-template-columns: 1fr; }
+  .feat { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .wrap { padding: 0 16px; }
+  header.top { grid-template-columns: 1fr; gap: 16px; }
+  header.top img { width: 72px; height: 72px; }
+  .shots { gap: 8px; }
+  .shots img { border-radius: 10px; }
+  section { padding: 40px 0; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <img src="../brand/concepts/01-pet-card/logo-512x512.png" alt="Reoka logo">
+  <div>
+    <h1>Three UI directions for Reoka</h1>
+    <p class="lead prose">Mockups for the Reoka Zalo Mini App: a pet's identity card, its health record, reminders, vaccination points and clinic contact. All three use the brand palette (teal, navy, mint) and the pet card from the banner. They differ in what the app is organised around.</p>
+  </div>
+</header>
+
+<div class="verdict">
+  <div>
+    <b class="pick">Recommendation</b>
+    <h3>Build on A (Hồ sơ), borrow three things from B and C</h3>
+    <p>Reoka's promise is that health data comes from the clinic and can be trusted. A looks most like a medical record: calm, structured, nothing playful competing with the data. It also maps directly onto <code>zmp-ui</code> list and tab components, so it is the cheapest and lightest to build.</p>
+  </div>
+  <div>
+    <p style="margin-bottom:4px">Take these from the other two:</p>
+    <ul>
+      <li><b>From B:</b> the QR side of the card and the centre “Mở thẻ” tab button, because showing the QR at the clinic counter is the most frequent real-world action. Also the vaccine progress bars.</li>
+      <li><b>From C:</b> “Lưu trữ” as the default instead of delete, the appointment detail screen (address, doctor, what to bring) and the always-visible 24/7 emergency number.</li>
+      <li><b>From C:</b> the list-first vaccination point finder with a small map strip. It loads faster than a full-screen map.</li>
+    </ul>
+  </div>
+</div>
+
+</div>
+
+<section style="border-top:0;padding-top:24px">
+<div class="wrap">
+  <h2>The templates</h2>
+  <p class="prose" style="color:var(--muted)">Each template file shows the same nine screens with the same data (Mochi the corgi and Bơ the cat), so they can be compared side by side. Open the full file to see every screen.</p>
+
+  <article class="tpl">
+    <div>
+      <h3>D · Kết hợp (selected)</h3>
+      <div class="meta"><span>Lexend</span><span>Mint page</span><span>5 tabs, QR in centre</span></div>
+      <p>The direction picked after review. B's look and tab bar, A's page layouts for home, pet detail, appointments and visit history, C's vaccination point finder and notifications, B's add flow, health book and clinic contact. The pet card keeps bank-card proportions (85.6 × 54 mm) and template A's card layout, and has two sides swiped with carousel dots: a simple front with address and QR, and a back with species, breed, sex, birth date, markings, owner, address and issue date.</p>
+      <div class="pros">
+        <div><h4>What changed</h4><ul><li>Home is the wallet: a quick switcher opens a sheet with every pet, “add pet” and archived pets</li><li>Pet detail toggles between the card and a large QR</li><li>Removing a pet offers archive (default) or permanent delete</li><li>17 screens; cards and toggles are interactive</li></ul></div>
+        <div><h4>Build notes</h4><ul><li>Two-sided card is a scroll-snap carousel, not a 3D flip, so it stays cheap on Zalo</li><li>Card back reuses the same data fields as the add/edit form</li><li>Add and edit share the same two screens</li></ul></div>
+      </div>
+      <a class="open" href="template-d-ket-hop.html">Open template D</a>
+    </div>
+    <div class="shots"><img src="previews/d-1.png" alt="Template D home with card front" loading="lazy"><img src="previews/d-2.png" alt="Template D card back" loading="lazy"><img src="previews/d-4.png" alt="Template D pet detail" loading="lazy"></div>
+  </article>
+
+  <article class="tpl">
+    <div>
+      <h3>A · Hồ sơ</h3>
+      <div class="meta"><span>Be Vietnam Pro</span><span>Cool grey page</span><span>4 tabs</span></div>
+      <p>A clinical record book. Grouped lists on a cool grey page, navy text, teal used only for actions. The brand pet card is the single loud object; on home you swipe between pets' cards.</p>
+      <div class="pros">
+        <div><h4>Strengths</h4><ul><li>Reads as the most professional and trustworthy</li><li>Closest to stock <code>zmp-ui</code>, fastest to build</li><li>Dense, scannable lists suit long medical history</li><li>Be Vietnam Pro was designed for Vietnamese diacritics</li></ul></div>
+        <div><h4>Trade-offs</h4><ul><li>Least emotional; looks like many health apps</li><li>QR needs one extra tap from home</li><li>Swiping cards gets slow beyond 4–5 pets</li></ul></div>
+      </div>
+      <a class="open" href="template-a-ho-so.html">Open template A</a>
+    </div>
+    <div class="shots"><img src="previews/a-1.png" alt="Template A home screen" loading="lazy"><img src="previews/a-2.png" alt="Template A pet detail" loading="lazy"><img src="previews/a-6.png" alt="Template A medical history" loading="lazy"></div>
+  </article>
+
+  <article class="tpl">
+    <div>
+      <h3>B · Ví thẻ</h3>
+      <div class="meta"><span>Lexend</span><span>Mint page</span><span>5 tabs, QR in centre</span></div>
+      <p>A pet wallet. Each pet is a pass, stacked like cards in a phone wallet, and flips to a large QR side. Larger radii, mint background, step-by-step add flow with big tap targets.</p>
+      <div class="pros">
+        <div><h4>Strengths</h4><ul><li>The pet card idea is strongest and most memorable</li><li>QR is one tap away from anywhere</li><li>Friendliest for non-technical owners</li><li>Vaccine progress bars show what is expiring at a glance</li></ul></div>
+        <div><h4>Trade-offs</h4><ul><li>Softer look; less “medical record” trust</li><li>Wallet stack and card flip need custom components</li><li>Full-screen map is the heaviest screen in all three</li></ul></div>
+      </div>
+      <a class="open" href="template-b-vi-the.html">Open template B</a>
+    </div>
+    <div class="shots"><img src="previews/b-1.png" alt="Template B wallet home" loading="lazy"><img src="previews/b-2.png" alt="Template B QR side of the card" loading="lazy"><img src="previews/b-6.png" alt="Template B vaccination history" loading="lazy"></div>
+  </article>
+
+  <article class="tpl">
+    <div>
+      <h3>C · Lịch chăm sóc</h3>
+      <div class="meta"><span>Nunito Sans</span><span>Navy header band</span><span>4 tabs</span></div>
+      <p>The app is organised around time. A navy band holds the pet switcher; below it one care timeline with a big date column as its spine. Upcoming events on top, history continues below.</p>
+      <div class="pros">
+        <div><h4>Strengths</h4><ul><li>Best fit for the reminder job: “what is next” is the home screen</li><li>One visual pattern for schedule and history</li><li>Pet switcher scales well to many pets</li><li>Considerate flows: archive, emergency contact, appointment prep</li></ul></div>
+        <div><h4>Trade-offs</h4><ul><li>Pet card is less prominent on home</li><li>Navy header needs <code>setNavigationBarColor</code> per page</li><li>Timeline looks empty for a new pet with no records</li></ul></div>
+      </div>
+      <a class="open" href="template-c-lich-cham-soc.html">Open template C</a>
+    </div>
+    <div class="shots"><img src="previews/c-1.png" alt="Template C home timeline" loading="lazy"><img src="previews/c-2.png" alt="Template C pet card" loading="lazy"><img src="previews/c-6.png" alt="Template C health record timeline" loading="lazy"></div>
+  </article>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+  <h2>Side by side</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Criterion</th><th>A · Hồ sơ</th><th>B · Ví thẻ</th><th>C · Lịch chăm sóc</th></tr></thead>
+    <tbody>
+      <tr><td>Professional, trustworthy look</td><td><span class="r g">Strong</span></td><td><span class="r m">Good</span></td><td><span class="r g">Strong</span></td></tr>
+      <tr><td>Pet card prominence</td><td><span class="r g">Strong</span></td><td><span class="r g">Strongest</span></td><td><span class="r m">Medium</span></td></tr>
+      <tr><td>Reminders and “what's next”</td><td><span class="r m">Good</span></td><td><span class="r m">Good</span></td><td><span class="r g">Strongest</span></td></tr>
+      <tr><td>Reading long medical history</td><td><span class="r g">Strong</span></td><td><span class="r m">Good</span></td><td><span class="r g">Strong</span></td></tr>
+      <tr><td>Many pets (5+)</td><td><span class="r m">Medium</span></td><td><span class="r m">Medium</span></td><td><span class="r g">Strong</span></td></tr>
+      <tr><td>Lightness on Zalo</td><td><span class="r g">Lightest</span></td><td><span class="r l">Heaviest</span></td><td><span class="r g">Light</span></td></tr>
+      <tr><td>Build effort with <code>zmp-ui</code></td><td><span class="r g">Low</span></td><td><span class="r l">High</span></td><td><span class="r m">Medium</span></td></tr>
+      <tr><td>Friendliness for older owners</td><td><span class="r m">Good</span></td><td><span class="r g">Strong</span></td><td><span class="r m">Good</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+  <h2>Where each use case lives</h2>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Use case</th><th>A</th><th>B</th><th>C</th></tr></thead>
+    <tbody>
+      <tr><td>See pets, their cards</td><td>Home, swipe cards</td><td>Wallet stack</td><td>Pet switcher, card row</td></tr>
+      <tr><td>Add / edit pet</td><td>One form</td><td>2-step flow</td><td>One form, required vs optional</td></tr>
+      <tr><td>Delete pet</td><td>Bottom sheet, explains effect</td><td>Centred dialog with photo</td><td>Archive (default) or delete</td></tr>
+      <tr><td>Show QR at clinic</td><td>Card on pet detail</td><td>Centre tab, QR side</td><td>Card screen on navy</td></tr>
+      <tr><td>Notifications</td><td>Tab, grouped list</td><td>Tab, filter chips, reply buttons</td><td>Tab, flat list</td></tr>
+      <tr><td>Vet appointments</td><td>Week strip + list</td><td>Month calendar</td><td>Home timeline + detail screen</td></tr>
+      <tr><td>Vaccination points</td><td>Map + bottom sheet</td><td>Full map + card carousel</td><td>List + map strip</td></tr>
+      <tr><td>Medical history</td><td>Expanded latest + list</td><td>Health book tabs</td><td>Timeline with filters</td></tr>
+      <tr><td>Contact clinic</td><td>Clinic page, 3 actions</td><td>4 tiles + quick Zalo questions</td><td>Emergency + clinic list</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+  <h2>Features worth adding</h2>
+  <p class="prose" style="color:var(--muted)">Ranked by how much they help the core promise (trusted health identity plus reminders) against how much they cost to build.</p>
+  <div class="feat">
+    <div>
+      <h3>Add to MVP</h3>
+      <ul>
+        <li><b>Lost-pet mode on the QR page</b><span>Owner switches it on; anyone scanning sees “I'm lost” with a call button. Cheap and the main reason strangers scan a pet tag.</span></li>
+        <li><b>Reply to reminders</b><span>“Sẽ đến” / “Đổi lịch” buttons in the reminder. Clinics get fewer no-shows, which is a selling point for clinic sign-up.</span></li>
+        <li><b>Archive instead of delete</b><span>Keeps history for pets given away or passed away. Avoids the irreversible-delete support tickets.</span></li>
+        <li><b>Share card via Zalo</b><span><code>openShareSheet</code> to send the card to family or a pet sitter. Free growth inside Zalo.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Next phase</h3>
+      <ul>
+        <li><b>Family co-owners</b><span>Invite a spouse or parent by Zalo so both get reminders.</span></li>
+        <li><b>Owner's own reminders</b><span>Deworming, flea and tick, heartworm pills. Kept separate from clinic records so the trust model holds.</span></li>
+        <li><b>Medication schedule from prescriptions</b><span>Turn “½ viên × 2 lần/ngày, 7 ngày” into daily reminders.</span></li>
+        <li><b>Book a slot with the clinic</b><span>Already on the roadmap; the contact screens leave room for it.</span></li>
+        <li><b>Weight log</b><span>Clinic-entered weights as a small chart on the pet profile.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Later</h3>
+      <ul>
+        <li><b>Health passport PDF</b><span>One-page vaccination proof for boarding, grooming or travel.</span></li>
+        <li><b>Partner services</b><span>Grooming and boarding shops verify vaccinations by scanning the QR.</span></li>
+        <li><b>Post-visit rating</b><span>Simple rating after each visit, shown in the point finder.</span></li>
+        <li><b>Care tips by age and species</b><span>Short articles via Zalo OA, e.g. when a puppy's vaccine series ends.</span></li>
+        <li><b>Microchip number</b><span>Field included in template C's form; becomes useful once registries exist.</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<section>
+<div class="wrap">
+  <h2>Keeping it light on Zalo</h2>
+  <div class="notes">
+    <div><b>One font, two weights</b><span>Self-host a Vietnamese subset of the chosen font (regular + semibold) instead of Google Fonts, or fall back to the system font. Each weight is roughly 20–40 KB.</span></div>
+    <div><b>Inline SVG icons</b><span>Use one sprite as in <code>shared/kit.js</code> instead of an icon library. No icon font.</span></div>
+    <div><b>Lazy-load the map</b><span>Load the map SDK only on the vaccination-point screen. Template C's list-first layout can even start with a static map image.</span></div>
+    <div><b>Small pet photos</b><span>Resize uploads to around 320 px WebP for avatars; keep originals only for the card export.</span></div>
+    <div><b>Draw the QR in the client</b><span>Generate the QR from <code>public_code</code> with a small library instead of downloading images.</span></div>
+    <div><b>Check API approvals early</b><span><code>getPhoneNumber</code> and <code>getLocation</code> need Zalo permission and approval; <code>openChat</code> to a clinic needs the clinic's OA ID.</span></div>
+  </div>
+</div>
+</section>
+
+<section>
+<div class="wrap prose">
+  <h2>Next steps</h2>
+  <ol class="steps">
+    <li>Pick a template (or confirm the A + borrowed parts recommendation).</li>
+    <li>Turn the chosen template into design tokens for <code>tailwind.config.js</code> and a <code>zmp-ui</code> theme.</li>
+    <li>Design the screens not covered here: onboarding and Zalo login, empty states, the public QR page, and the clinic-side app.</li>
+    <li>Test the pet card and QR screen with two or three real owners at a clinic counter.</li>
+  </ol>
+</div>
+</section>
+
+<footer><div class="wrap">Mockups use sample data. QR codes are decorative and not scannable. Files: <code>design/ui/</code>.</div></footer>
+
+</body>
+</html>
