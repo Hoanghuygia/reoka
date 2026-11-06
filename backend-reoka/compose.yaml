@@ -1,0 +1,22 @@
+# Local development database. Bound to localhost only.
+name: reoka
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: reoka
+      POSTGRES_PASSWORD: reoka
+      POSTGRES_DB: reoka
+    ports:
+      - "127.0.0.1:5435:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reoka -d reoka"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:
