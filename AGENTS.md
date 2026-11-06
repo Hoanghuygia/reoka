@@ -2,11 +2,14 @@
 
 Reoka is a Zalo Mini App for pet health records, reminders and QR pet cards, with a B2B clinic web app planned on the same backend. See `README.md` for the product and `backend-reoka/README.md` for the backend design.
 
+**Before starting a task, read `docs/README.md`.** It routes each kind of requirement to the context it needs, and `docs/status.md` says what is built and which questions are still open. Keep `docs/` updated in the same change as the code.
+
 ## Layout
 
 - `mini-app-reoka/`: Zalo Mini App (React, TypeScript, zmp-ui, Tailwind, Jotai). Currently a scaffold.
 - `backend-reoka/`: Rust backend (Axum, SQLx, PostgreSQL). Login and pets are built; clinics, medical records, reminders and audit are not.
-- `design/`: brand assets and UI templates. See `design/README.md`.
+- `design/`: brand assets and UI templates. Template D is final. See `design/README.md`.
+- `docs/`: context for agents, not people.
 
 ## Commands
 
