@@ -1,5 +1,11 @@
 // ZaUI stylesheet
 import "zmp-ui/zaui.css";
+// Lexend, the brand font (Template D uses weights 300 to 700)
+import "@fontsource/lexend/300.css";
+import "@fontsource/lexend/400.css";
+import "@fontsource/lexend/500.css";
+import "@fontsource/lexend/600.css";
+import "@fontsource/lexend/700.css";
 // Tailwind stylesheet
 import "@/css/tailwind.scss";
 // Your stylesheet

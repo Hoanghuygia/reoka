@@ -1,14 +1,21 @@
+// Brand base from Template D. Lexend is bundled through @fontsource (see app.ts),
+// so the font does not depend on Google Fonts being reachable inside Zalo.
+:root {
+  --zaui-font-family: "Lexend", system-ui, sans-serif;
+}
+
+body,
+.zaui-page {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: #17324d;
+}
+
+.zaui-page {
+  background: #f2f9f7;
+}
+
 .page {
   padding: 16px 16px 96px 16px;
-}
-
-.section-container {
-  padding: 16px;
-  background: #ffffff;
-  border-radius: 8px;
-  margin-bottom: 24px;
-}
-
-.zaui-list-item {
-  cursor: pointer;
 }

@@ -22,6 +22,19 @@
    ```
 1. **Open** `localhost:3000` in your browser.
 
+### Connecting to the backend
+
+Set `VITE_API_BASE_URL` in `.env` (see `.env.example`). The app logs in through Zalo on start, so it needs a running `backend-reoka`.
+
+To test a real Zalo login on a phone, the phone must reach the backend over HTTPS:
+
+1. Run the backend with `CORS_ALLOWED_ORIGINS=*` while the Mini App's origin is unknown.
+1. Expose port 8080 with a tunnel, for example `cloudflared tunnel --url http://localhost:8080`.
+1. Set `VITE_API_BASE_URL` to the tunnel URL and restart `zmp start`.
+1. Open the app on the phone from the QR code that `zmp start` prints, or deploy a test version with `zmp deploy`.
+
+Dev builds show the raw error code under any error message.
+
 ## Deployment
 
 1. **Create** a mini program. For instructions on how to create a mini program, please refer to the [Coffee Shop Tutorial](https://mini.zalo.me/tutorial/coffee-shop/step-1/)
