@@ -32,7 +32,11 @@ A Zalo App can hold several Mini Apps (Official). Do not confuse the three above
 | `appsecret_proof` header = hex HMAC-SHA256 of the token keyed with the app secret | Secondary |
 | Proof checking is a per-app setting; calls without proof fail with `-242` when it is on | Secondary |
 | A bogus token returns a success HTTP status with `error: 452` "Session key invalid" in the body | Observed |
-| A valid token returns `id`, `name`, `error: 0` | **Unverified: never tried** |
+| The Zalo App must be activated on developers.zalo.me (which needs an app icon uploaded first), or `getAccessToken()` fails with -1401 | Observed 2026-11-17 |
+| `getAccessToken()` fails with `{"code":-1401,"message":"Login failed: Zalo app has not been activated"}` while the Zalo App is not activated. `authorize(scope.userInfo)` still shows its consent sheet, but the token call fails again afterwards. | Observed 2026-11-17 on a Development deploy (iOS) |
+| Fix for -1401: developers.zalo.me → the Zalo App → Settings → turn on Activate | Zalo staff answers on the community forum, not official docs |
+| Development versions open only for developers or admins of the Zalo App; testers can open Testing versions | Community forum, unverified |
+| A valid token from a Development deploy passes `/v2.0/me` with `appsecret_proof`, and login completes | Observed 2026-11-17 |
 | With the setting on, tokens from other apps are refused | **Unverified** |
 
 **Security note:** without the proof setting on, a token issued to another Zalo App might log in here. Test this with real tokens.
@@ -65,9 +69,24 @@ Read current ZNS and OA docs before building. None have been reviewed yet.
 
 ## Mini App networking
 
-Whether the API domain must be whitelisted in Mini App settings is **unverified**. Check when connecting. CORS on the backend comes from `CORS_ALLOWED_ORIGINS`; the origin of a deployed Mini App is also unknown.
+Whether the API domain must be whitelisted in Mini App settings is **unverified**. Check when connecting. CORS on the backend comes from `CORS_ALLOWED_ORIGINS`; `*` allows any origin (D23). The Mini App inside Zalo calls the API from origin `https://h5.zdn.vn` (Observed 2026-11-17, Development deploy on iOS, real login). Whether Testing and released versions use the same origin is unverified. Before going live, set `CORS_ALLOWED_ORIGINS` to the observed origins instead of `*`.
+
+A phone running the Mini App cannot reach `localhost`. Quick tunnels (`cloudflared tunnel --url`) die when the laptop sleeps or the network drops ("Tunnel not found" in its log), and the next one has a new URL, so the Mini App must be rebuilt and redeployed. Testing on a device needs the backend behind an HTTPS tunnel, with that URL in `VITE_API_BASE_URL` (`mini-app-reoka/.env`). Whether Zalo accepts a plain-HTTP API URL is unverified, so assume HTTPS.
 
 One community report says `/v2.0/me` returned `-501` when called from Cloudflare Workers. Keep in mind when choosing hosting (Secondary, unconfirmed).
+
+## Running on a phone and releasing
+
+| Fact | Confidence |
+|---|---|
+| `zmp deploy` uploads a build to Zalo, then gives a QR code to open it in the Zalo app | Official, plus Zalo's own tutorials |
+| A **Development** deploy is overwritten by each new one and is not listed under version management. It is for quick checks. | Official |
+| A **Testing** deploy is numbered and kept under version management. Only Testing versions can be submitted for review. | Official, plus a Zalo forum answer |
+| After review passes, the owner releases the version, and only then can all Zalo users open it | Official (no detailed steps found) |
+| Development and Testing versions open only for the Mini App's admins and members added in the developer console, not for other users | **Unverified**: from memory. Check in the console. |
+| The backend must be reachable from the internet (hosted or tunnelled) for a deployed build to call it | Zalo coffee-shop tutorial |
+
+Sources: https://docs.zaloplatforms.com/docs/MA/devtools/cli/deploy, https://miniapp.zaloplatforms.com/community/4858332794848363200/cach-gui-xet-duyet-phien-ban-development, https://github.com/Zalo-MiniApp/coffee-shop-tutorial
 
 ## Sources
 

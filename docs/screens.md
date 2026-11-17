@@ -4,7 +4,7 @@ Source: `design/ui/template-d-ket-hop.html`. Each screen is a `<figure class="g-
 
 ## Visual tokens
 
-Copy these from the template's `:root` into `mini-app-reoka/tailwind.config.js`. Nothing is wired up yet.
+Copied from the template's `:root` into `mini-app-reoka/tailwind.config.js` (`teal`, `navy`, `mint`, `page`, `muted`, `faint`, `line`, `due`, `ok`, `danger`). Lexend is bundled through `@fontsource/lexend` and is the default `font-sans`.
 
 - Font: Lexend, weights 300 to 700. Base size 14.5px.
 - Colors: teal `#087F8C`, teal-dark `#056570`, navy `#17324D`, mint `#DDF4EF`, mint-2 `#C5EAE2`, page `#F2F9F7`, muted `#587184`, faint `#8DA1AF`, line `#DCEBE7`.
@@ -16,7 +16,7 @@ Copy these from the template's `:root` into `mini-app-reoka/tailwind.config.js`.
 
 | # | Screen | Needs from backend | Available now |
 |---|---|---|---|
-| 1 | Home, card front | Pets, owner address, upcoming appointments | Pets only |
+| 1 | Home, card front | Pets, owner address, upcoming appointments | Pets only. A first cut (greeting and pet list, no card) is in `src/pages/index.tsx`. |
 | 2 | Home, card back | Pet, owner name and phone, address | Pet only |
 | 3 | Wallet | Pets including archived, color per pet | Pets, no archive |
 | 4 | Pet detail, card | Pet, edit | Read only |
@@ -53,7 +53,7 @@ Species in the design is Chó, Mèo or Khác; `pets.species` is free text. Gende
 
 | # | Design says | Conflict | Suggested handling |
 |---|---|---|---|
-| C1 | Screen 5: QR is "dễ quét ở quầy phòng khám" (easy to scan at the clinic counter) | D11: the QR never grants access | Scanning identifies the pet and starts a request the owner approves. Needs confirmation (open question 2). |
+| C1 | Screen 5: QR is "dễ quét ở quầy phòng khám" (easy to scan at the clinic counter) | D11: the QR never grants access | **Resolved (D12):** scanning identifies the pet and starts a request the owner approves. The Mini App needs an approval prompt, which is not in the mockups. |
 | C2 | Screen 15: "Thẻ của Mochi được quét ở Quận 3" (card scanned in District 3) | No scan log, and location of a public scanner is a privacy matter. The QR page opens on the web without login. | Ask whether it is needed. Could log the time only. |
 | C3 | Screen 13 has "Đặt lịch" (book), and screen 10 implies booked appointments | Booking is a later phase in the roadmap | Build read-only first, or hide the button |
 | C4 | Screen 13, finder; screen 14, contact | Neither is in the README roadmap | Ask about priority before building |

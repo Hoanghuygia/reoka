@@ -2,7 +2,7 @@
 
 **Reoka** is a **Zalo Mini App** for pet management: it stores pet health records, sends revisit/re-vaccination reminders via Zalo, and provides an **online pet card** with a QR code. A **B2B web app** for veterinary clinics is planned and will share the same backend.
 
-> **Status:** early stage. The Mini App is a scaffold and `backend-reoka/` so far covers Zalo login and pets, without the Mini App calling it yet. Sections below describe the planned product unless stated otherwise.
+> **Status:** early stage. `backend-reoka/` covers Zalo login and pets. The Mini App logs in with a real Zalo account and lists pets; the Template D screens are not built yet. Sections below describe the planned product unless stated otherwise.
 
 ## Goals
 
@@ -25,7 +25,7 @@
 
 1. **First visit:** The pet owner opens the Reoka Zalo Mini App and creates an account (Zalo login).
 2. **Add a pet:** The owner adds a pet to their account (name, species, breed, birth date, gender, photo, ...).
-3. **Link with a clinic:** The owner grants the clinic access to the pet's profile, by approving a request in the app or showing a short-lived code. The public QR on the pet card does not grant this access.
+3. **Link with a clinic:** At the counter, the clinic scans the QR on the pet card, which sends an access request. The owner approves it in the Mini App. Scanning alone never grants access.
 4. **After the visit:** The clinic records information in the pet's profile:
    - Diagnosis, symptoms, treatment, prescription, notes.
    - Vaccination: vaccine type, clinic/pet shop that administered it, vaccination date, re-vaccination due date.
@@ -62,7 +62,7 @@
 
 ## Data permissions
 
-The Clinic column applies only to pets the clinic has been granted access to.
+The Clinic column applies only to pets the clinic has been granted access to. A clinic with access sees the pet's whole history, including records written by other clinics.
 
 | Data | Owner | Clinic | Public (QR) |
 |---|---|---|---|
@@ -78,7 +78,7 @@ The Clinic column applies only to pets the clinic has been granted access to.
 - **AuthIdentity**: `id`, `user_id`, `provider` (zalo / password), `provider_uid`, `password_hash`. Separates a person from how they log in, so web staff accounts need no Zalo ID.
 - **Clinic**: `id`, `name`, `address`, `phone`
 - **ClinicStaff**: `user_id`, `clinic_id`, `role`
-- **Pet**: `id`, `owner_id`, `name`, `species`, `breed`, `gender`, `birth_date`, `color`, `avatar`, `public_code` (used for the QR)
+- **Pet**: `id`, `owner_id`, `name`, `species`, `breed`, `gender`, `birth_date`, `color`, `avatar`, `card_code` (short code printed on the card, such as `#RK-0215`), `public_code` (long random code used for the QR)
 - **ClinicPetAccess**: `clinic_id`, `pet_id`, `granted_at`, `granted_by`, `revoked_at`
 - **MedicalRecord**: `id`, `pet_id`, `clinic_id`, `visit_date`, `symptoms`, `diagnosis`, `treatment`, `prescription`, `notes`, `next_visit_date`, `created_by`, `updated_by`
 - **Vaccination**: `id`, `pet_id`, `clinic_id`, `vaccine_name`, `dose`, `vaccinated_at`, `next_due_date`, `notes`, `created_by`, `updated_by`
@@ -112,7 +112,6 @@ The B2B web app will get its own top-level directory when work on it starts.
 
 ## Open questions
 
-- Can a clinic with access to a pet see records written by other clinics?
 - How are staff accounts created and invited, on both the Mini App and the web app?
 
 ## Roadmap (proposed)

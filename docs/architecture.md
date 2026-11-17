@@ -5,11 +5,12 @@
 ```
 Zalo Mini App ─┐                     ┌─► PostgreSQL
 B2B web (later)┼─► backend-reoka ────┼─► Zalo APIs (verify token, phone, ZNS, OA)
-QR page (later)┘   one binary        └─► Object storage (later, undecided)
+QR page (later)┘   one binary        └─► MinIO, S3 API (planned, D25)
 ```
 
 - One binary, one database. The reminder worker will run in the same binary at first.
 - Clients map to routers: `/app` (Mini App, exists), `/clinic` (B2B, planned), `/public` (QR page, planned).
+- Mini App: `SessionGate` logs in on start (`getAccessToken` → `POST /app/auth/zalo`) and stores the user in `sessionAtom`. `src/api/client.ts` holds the token in memory and re-logs in once on 401 (D22).
 - Repo dirs do not share code. `mini-app-reoka` is npm, `backend-reoka` is Cargo, and there is no root workspace. The API contract will connect them through OpenAPI (planned).
 
 ## Backend layers

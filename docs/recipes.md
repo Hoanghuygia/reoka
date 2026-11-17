@@ -60,7 +60,7 @@ cargo sqlx prepare -- --all-targets
 1. Read the screen and its caption in `design/ui/template-d-ket-hop.html`, and its row in `docs/screens.md`.
 2. Check the conflicts in `docs/screens.md`.
 3. Use zmp-ui components and Tailwind tokens. The tokens must be added first, as `tailwind.config.js` has none. Copy is Vietnamese.
-4. Register routes in `src/components/layout.tsx`. Use Jotai for shared state.
+4. Register routes in `src/components/layout.tsx`, inside `SessionGate`, which logs in before any screen renders. Use Jotai for shared state (`src/state/`).
 
 ## Gotchas
 
@@ -75,3 +75,8 @@ cargo sqlx prepare -- --all-targets
 - **Port 5434 and the `stickified-*` containers:** unrelated project. Do not touch them. Reoka uses 5435.
 - **`.codegraph/`:** a local code index tool. Not a source of truth.
 - **`mini-app-reoka` scripts:** `npm start` needs the Zalo Mini App CLI globally. `zmp-cli.json` is template leftovers with a foreign path.
+- **Node not found:** Node and `zmp` are installed through nvm. Run `export PATH="$HOME/.nvm/versions/node/v22.23.4/bin:$PATH"`.
+- **Type checking the Mini App:** TypeScript is not a dependency, and `npm run build` does not type-check. Run `npx -p typescript@5.6.3 tsc -p .`. The `lib` is ES2017, so `Promise.finally` is missing.
+- **Mini App env vars:** Vite's root is `src/` in the config but `.` in `npm run build`, so `envDir` in `vite.config.mts` is an absolute path. Only `VITE_*` variables reach the bundle; `ZMP_TOKEN` must never get that prefix.
+- **White screen, `useLocation() may be used only in the context of a <Router>`:** zmp-ui `Page` must render inside `ZMPRouter`. Anything that renders a `Page` (like `SessionGate`) goes inside it. Browser dev mode may not show this, so check on a device via the Zalo debug console.
+- **Mini App API calls:** go through `src/api/client.ts`, which adds the bearer token and handles the 401 re-login. Do not call `fetch` from screens.

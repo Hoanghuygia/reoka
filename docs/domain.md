@@ -10,7 +10,7 @@
 | Pet card | Two-sided digital card for a pet | Thẻ thú cưng |
 | Wallet | List of a user's pet cards | Ví thẻ |
 | `public_code` | Random 16-character ID in the QR. Public. Identifies a pet and grants nothing. | |
-| Card code | Short human-readable code such as `#RK-0215`. Not in the schema yet (open question 4). | Mã thẻ |
+| Card code | Short human-readable code such as `#RK-0215`, printed on the card. Separate from `public_code` (D24). Not in the schema yet; generation is open question 4. | Mã thẻ |
 | Health book | A pet's vaccinations, visits and attachments | Sổ sức khoẻ |
 | Re-vaccination | Next dose due date | Tái chủng, tiêm lại |
 | Revisit | Follow-up appointment | Tái khám |
@@ -46,6 +46,7 @@ The draft is in the root `README.md` Data model section. Add fields only when th
 
 - `clinics`, `clinic_staff`
 - `clinic_pet_access`: `clinic_id`, `pet_id`, `granted_at`, `granted_by`, `revoked_at`. Active means `revoked_at IS NULL`.
+- Access requests (D12): created when a clinic scans the card QR, then approved or declined by the owner. Needs storage, either a status on `clinic_pet_access` (`pending`, `active`, `declined`, `revoked`) or a separate table. Decide when building `clinic`.
 - `medical_records`, `vaccinations`
 - `reminders`: unique on `type`, `ref_id`, `remind_at`. Status is `pending`, `sent`, `failed` or `cancelled`.
 - `audit_log`
@@ -54,7 +55,7 @@ The draft is in the root `README.md` Data model section. Add fields only when th
 
 **Pet:** created by the owner → `public_code` assigned at creation → edited by the owner → (planned) archived, then restorable, or permanently deleted.
 
-**Access grant:** none → owner grants → active → owner revokes. Revoking stops new access. What happens to records the clinic already wrote is undefined.
+**Access grant:** none → clinic scans the card QR → request pending → owner approves (active) or declines → owner revokes. Revoking stops new access. What happens to records the clinic already wrote is undefined.
 
 **Reminder:** created with its vaccination or revisit at D-3, D-1 and D-0 → `pending` → the worker claims it → `sent`, or retried up to a limit and then `failed`. Changing the date moves pending reminders to `cancelled` and creates new ones.
 
@@ -64,10 +65,11 @@ The draft is in the root `README.md` Data model section. Add fields only when th
 |---|---|---|---|---|
 | Basic pet info | Read, write | Read | Nothing | Allowlisted fields |
 | Owner info | Read, write | Read | Nothing | Hidden unless the owner opts in |
-| Medical records | Read | Read, write (see open question 1) | Nothing | Nothing |
-| Vaccinations | Read | Read, write | Nothing | Read |
+| Medical records | Read | Read all, including other clinics' (D21); write | Nothing | Nothing |
+| Vaccinations | Read | Read all, including other clinics' (D21); write | Nothing | Read |
 | Schedule | Read | Read, write | Nothing | Re-vaccination dates only |
 
 - Admin (`users.is_admin`) manages clinics and accounts. Admin endpoints do not exist yet.
-- Searching by phone, card code or QR may identify a pet, but never reveals records without active access.
+- Searching by phone, card code or QR may identify a pet, but never reveals records without active access. A clinic scanning the QR sees only what it needs to send an access request.
+- Whether a clinic may edit a record another clinic wrote is undecided. See `status.md`.
 - The invariants tests must protect are in `AGENTS.md`.
