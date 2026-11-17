@@ -44,6 +44,7 @@ pub async fn login_with_zalo(
 
     let user = find_or_create_user(db, &profile).await?;
     let token = tokens.issue(user.id)?;
+    tracing::info!(user_id = %user.id, "logged in with Zalo");
     Ok(Session { token, user })
 }
 

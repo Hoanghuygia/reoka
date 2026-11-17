@@ -16,7 +16,7 @@ API server and reminder worker for Reoka. It serves the Zalo Mini App, the plann
 | Background jobs (planned) | The `reminder` table used as a queue, claimed with `FOR UPDATE SKIP LOCKED` |
 | Zalo | Hand-written client on `reqwest` + `serde`, since there is no official Rust SDK that we know of |
 
-Not decided yet: hosting and object storage for pet photos.
+Pet photos and attachments will go to MinIO through the S3 API, so the backend can move to AWS S3 or another S3-compatible store by changing config (not built yet). Hosting is not decided.
 
 ## Architecture
 
@@ -95,8 +95,8 @@ The Zalo app secret and OA tokens stay on the backend and are never sent to a cl
 These rules are the most important in the codebase. The compiler will not catch a mistake here, so each needs integration tests.
 
 - **Clinic isolation:** every `/clinic` query is scoped by the `clinic_id` from the session, never one supplied by the client.
-- **Pet access:** a clinic reads or writes a pet's records only with an active `ClinicPetAccess` row.
-- **Granting access:** only the owner grants access, by approving a request or showing a short-lived code. The `public_code` is public and never grants access. Searching by phone number or pet code never reveals records on its own.
+- **Pet access:** a clinic reads or writes a pet's records only with an active `ClinicPetAccess` row. With access, it reads the pet's whole history, including records written by other clinics.
+- **Granting access:** only the owner grants access. At the counter, the clinic scans the card QR, which creates an access request that the owner approves in the Mini App. The `public_code` is public, so a scan only identifies the pet and never grants access by itself. Searching by phone number or pet code never reveals records on its own.
 - **Owners:** an owner reads only their own pets, and cannot edit medical or vaccination data.
 - **Public page:** returns an explicit allowlist of fields, and looks pets up only by `public_code`.
 - **Audit:** each change to medical or vaccination data writes an audit row in the same transaction.

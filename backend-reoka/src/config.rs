@@ -12,13 +12,24 @@ pub enum ConfigError {
     Invalid(&'static str, String),
 }
 
+/// Which browser origins may call the API.
+#[derive(Clone)]
+pub enum CorsOrigins {
+    /// `CORS_ALLOWED_ORIGINS=*`. For testing while the Mini App's origin inside
+    /// Zalo is unknown. Not a hole in itself, since auth is a bearer header and
+    /// not a cookie, but list the real origins before going live.
+    Any,
+    /// An exact list of origins. Empty means no browser origin is allowed.
+    List(Vec<HeaderValue>),
+}
+
 /// Runtime configuration. Deliberately has no `Debug`, so secrets can't end up in logs.
 pub struct Config {
     pub database_url: String,
     pub bind_addr: String,
     pub jwt_secret: String,
     pub zalo_app_secret: String,
-    pub cors_allowed_origins: Vec<HeaderValue>,
+    pub cors_allowed_origins: CorsOrigins,
 }
 
 impl Config {
@@ -50,13 +61,45 @@ fn required(name: &'static str) -> Result<String, ConfigError> {
     }
 }
 
-fn parse_origins(raw: &str) -> Result<Vec<HeaderValue>, ConfigError> {
-    raw.split(',')
+fn parse_origins(raw: &str) -> Result<CorsOrigins, ConfigError> {
+    if raw.trim() == "*" {
+        return Ok(CorsOrigins::Any);
+    }
+
+    let origins = raw
+        .split(',')
         .map(str::trim)
         .filter(|origin| !origin.is_empty())
         .map(|origin| {
             HeaderValue::from_str(origin)
                 .map_err(|_| ConfigError::Invalid("CORS_ALLOWED_ORIGINS", origin.to_string()))
         })
-        .collect()
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(CorsOrigins::List(origins))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn star_allows_any_origin() {
+        assert!(matches!(parse_origins(" * "), Ok(CorsOrigins::Any)));
+    }
+
+    #[test]
+    fn list_is_split_on_commas() {
+        let Ok(CorsOrigins::List(origins)) = parse_origins("http://a.test, http://b.test,") else {
+            panic!("expected a list");
+        };
+        assert_eq!(origins, ["http://a.test", "http://b.test"]);
+    }
+
+    #[test]
+    fn empty_means_no_origin() {
+        let Ok(CorsOrigins::List(origins)) = parse_origins("") else {
+            panic!("expected a list");
+        };
+        assert!(origins.is_empty());
+    }
 }

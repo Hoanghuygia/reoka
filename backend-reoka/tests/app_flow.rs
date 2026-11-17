@@ -10,6 +10,7 @@ use axum::{
     http::{Request, StatusCode, header},
 };
 use backend_reoka::{
+    config::CorsOrigins,
     http::router,
     identity::TokenService,
     state::AppState,
@@ -45,7 +46,7 @@ fn app(db: PgPool) -> Router {
             zalo: Arc::new(FakeZalo),
             tokens: TokenService::new(TEST_SECRET),
         },
-        vec![],
+        CorsOrigins::List(vec![]),
     )
 }
 

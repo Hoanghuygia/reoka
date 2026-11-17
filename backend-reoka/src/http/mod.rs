@@ -8,17 +8,24 @@ mod json;
 use axum::{
     Json, Router,
     extract::State,
-    http::{HeaderValue, Method, StatusCode, header},
+    http::{Method, Request, StatusCode, header},
     routing::get,
 };
 use serde_json::{Value, json};
-use tower_http::{cors::CorsLayer, trace::TraceLayer};
+use tower_http::{
+    cors::{AllowOrigin, CorsLayer},
+    trace::TraceLayer,
+};
 
-use crate::state::AppState;
+use crate::{config::CorsOrigins, state::AppState};
 
-pub fn router(state: AppState, cors_allowed_origins: Vec<HeaderValue>) -> Router {
+pub fn router(state: AppState, cors_allowed_origins: CorsOrigins) -> Router {
+    let allow_origin = match cors_allowed_origins {
+        CorsOrigins::Any => AllowOrigin::any(),
+        CorsOrigins::List(origins) => AllowOrigin::list(origins),
+    };
     let cors = CorsLayer::new()
-        .allow_origin(cors_allowed_origins)
+        .allow_origin(allow_origin)
         .allow_methods([
             Method::GET,
             Method::POST,
@@ -31,7 +38,18 @@ pub fn router(state: AppState, cors_allowed_origins: Vec<HeaderValue>) -> Router
     Router::new()
         .route("/health", get(health))
         .nest("/app", app::router())
-        .layer(TraceLayer::new_for_http())
+        // The request span includes the `Origin` header, so the logs show
+        // which origin the Mini App really calls from (see docs/zalo.md).
+        .layer(
+            TraceLayer::new_for_http().make_span_with(|request: &Request<_>| {
+                tracing::info_span!(
+                    "request",
+                    method = %request.method(),
+                    uri = %request.uri(),
+                    origin = ?request.headers().get(header::ORIGIN),
+                )
+            }),
+        )
         .layer(cors)
         .with_state(state)
 }
